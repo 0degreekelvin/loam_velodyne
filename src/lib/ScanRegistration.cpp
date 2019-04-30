@@ -146,7 +146,7 @@ bool ScanRegistration::setupROS(ros::NodeHandle& node, ros::NodeHandle& privateN
     return false;
 
   // subscribe to IMU topic
-  _subImu = node.subscribe<sensor_msgs::Imu>("/imu/data", 50, &ScanRegistration::handleIMUMessage, this);
+  _subImu = node.subscribe<sensor_msgs::Imu>("/imu/data2", 50, &ScanRegistration::handleIMUMessage, this); //removing imu data form loam
 
   // advertise scan registration topics
   _pubLaserCloud            = node.advertise<sensor_msgs::PointCloud2>("/velodyne_cloud_2", 2);
