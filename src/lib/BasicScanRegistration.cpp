@@ -122,7 +122,7 @@ void BasicScanRegistration::setIMUTransformFor(const float& relTime)
 void BasicScanRegistration::transformToStartIMU(pcl::PointXYZI& point)
 {
   // rotate point to global IMU system
-  rotateZXY(point, _imuCur.yaw, _imuCur.roll, _imuCur.pitch);
+  rotateZXY(point, _imuCur.roll, _imuCur.pitch, _imuCur.yaw);
 
   // add global IMU position shift
   point.x += _imuPositionShift.x();
@@ -130,7 +130,7 @@ void BasicScanRegistration::transformToStartIMU(pcl::PointXYZI& point)
   point.z += _imuPositionShift.z();
 
   // rotate point back to local IMU system relative to the start IMU state
-  rotateYXZ(point, -_imuStart.pitch, -_imuStart.roll, -_imuStart.yaw);
+  rotateYXZ(point, -_imuStart.yaw, -_imuStart.pitch, -_imuStart.roll);
 }
 
 
@@ -257,23 +257,23 @@ void BasicScanRegistration::extractFeatures(const uint16_t& beginIdx)
 
 void BasicScanRegistration::updateIMUTransform()
 {
-  _imuTrans[0].x = _imuStart.roll.rad();
-  _imuTrans[0].y = _imuStart.pitch.rad();
-  _imuTrans[0].z = _imuStart.yaw.rad();
+  _imuTrans[0].x = _imuStart.pitch.rad();
+  _imuTrans[0].y = _imuStart.yaw.rad();
+  _imuTrans[0].z = _imuStart.roll.rad();
 
-  _imuTrans[1].x = _imuCur.roll.rad();
-  _imuTrans[1].y = _imuCur.pitch.rad();
-  _imuTrans[1].z = _imuCur.yaw.rad();
+  _imuTrans[1].x = _imuCur.pitch.rad();
+  _imuTrans[1].y = _imuCur.yaw.rad();
+  _imuTrans[1].z = _imuCur.roll.rad();
 
   Vector3 imuShiftFromStart = _imuPositionShift;
-  rotateYXZ(imuShiftFromStart, -_imuStart.pitch, -_imuStart.roll, -_imuStart.yaw);
+  rotateYXZ(imuShiftFromStart, -_imuStart.yaw, -_imuStart.pitch, -_imuStart.roll);
 
   _imuTrans[2].x = imuShiftFromStart.x();
   _imuTrans[2].y = imuShiftFromStart.y();
   _imuTrans[2].z = imuShiftFromStart.z();
 
   Vector3 imuVelocityFromStart = _imuCur.velocity - _imuStart.velocity;
-  rotateYXZ(imuVelocityFromStart, -_imuStart.pitch, -_imuStart.roll, -_imuStart.yaw);
+  rotateYXZ(imuVelocityFromStart, -_imuStart.yaw, -_imuStart.pitch, -_imuStart.roll);
 
   _imuTrans[3].x = imuVelocityFromStart.x();
   _imuTrans[3].y = imuVelocityFromStart.y();

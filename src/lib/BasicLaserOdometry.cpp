@@ -79,8 +79,8 @@ size_t BasicLaserOdometry::transformToEnd(pcl::PointCloud<pcl::PointXYZI>::Ptr& 
       point.y += _transform.pos.y() - _imuShiftFromStart.y();
       point.z += _transform.pos.z() - _imuShiftFromStart.z();
 
-      rotateZXY(point, _imuYawStart, _imuRollStart, _imuPitchStart);
-      rotateYXZ(point, -_imuPitchEnd, -_imuRollEnd, -_imuYawEnd);
+      rotateZXY(point, _imuRollStart, _imuPitchStart, _imuYawStart);
+      rotateYXZ(point, -_imuYawEnd, -_imuPitchEnd, -_imuRollEnd);
    }
 
    return cloudSize;
@@ -181,13 +181,13 @@ void BasicLaserOdometry::accumulateRotation(Angle cx, Angle cy, Angle cz,
 void BasicLaserOdometry::updateIMU(pcl::PointCloud<pcl::PointXYZ> const& imuTrans)
 {
    assert(4 == imuTrans.size());
-   _imuPitchStart = imuTrans.points[0].y;
-   _imuYawStart = imuTrans.points[0].z;
-   _imuRollStart = imuTrans.points[0].x;
+   _imuPitchStart = imuTrans.points[0].x;
+   _imuYawStart = imuTrans.points[0].y;
+   _imuRollStart = imuTrans.points[0].z;
 
-   _imuPitchEnd = imuTrans.points[1].y;
-   _imuYawEnd = imuTrans.points[1].z;
-   _imuRollEnd = imuTrans.points[1].x;
+   _imuPitchEnd = imuTrans.points[1].x;
+   _imuYawEnd = imuTrans.points[1].y;
+   _imuRollEnd = imuTrans.points[1].z;
 
    _imuShiftFromStart = imuTrans.points[2];
    _imuVeloFromStart = imuTrans.points[3];
@@ -203,8 +203,8 @@ void BasicLaserOdometry::process()
       _lastCornerKDTree.setInputCloud(_lastCornerCloud);
       _lastSurfaceKDTree.setInputCloud(_lastSurfaceCloud);
 
-      _transformSum.rot_y += _imuPitchStart;
-      _transformSum.rot_x += _imuRollStart;
+      _transformSum.rot_x += _imuPitchStart;
+      _transformSum.rot_z += _imuRollStart;
 
       _systemInited = true;
       return;
@@ -632,15 +632,15 @@ void BasicLaserOdometry::process()
                       -_transform.rot_z,
                       rx, ry, rz);
 
-   Vector3 v(_transform.pos.x() * 1.05 - _imuShiftFromStart.x(),
+   Vector3 v(_transform.pos.x() - _imuShiftFromStart.x(),
              _transform.pos.y() - _imuShiftFromStart.y(),
-             _transform.pos.z() - _imuShiftFromStart.z());
+             _transform.pos.z() * 1.05 - _imuShiftFromStart.z());
    rotateZXY(v, rz, rx, ry);
    Vector3 trans = _transformSum.pos - v;
 
    pluginIMURotation(rx, ry, rz,
-                     _imuRollStart, _imuPitchStart, _imuYawStart,
-                     _imuRollEnd, _imuPitchEnd, _imuYawEnd,
+                     _imuPitchStart, _imuYawStart, _imuRollStart,
+                     _imuPitchEnd, _imuYawEnd, _imuRollEnd,
                      rx, ry, rz);
 
    _transformSum.rot_x = rx;

@@ -170,7 +170,7 @@ bool LaserMapping::setup(ros::NodeHandle& node, ros::NodeHandle& privateNode)
       ("/velodyne_cloud_3", 2, &LaserMapping::laserCloudFullResHandler, this);
 
    // subscribe to IMU topic
-   _subImu = node.subscribe<sensor_msgs::Imu>("/imu/loam", 50, &LaserMapping::imuHandler, this); //removing imu data from loam
+   _subImu = node.subscribe<sensor_msgs::Imu>("/imu/loam", 50, &LaserMapping::imuHandler, this); //removing imu data form loam
 
    return true;
 }

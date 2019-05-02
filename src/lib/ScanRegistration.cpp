@@ -146,7 +146,7 @@ bool ScanRegistration::setupROS(ros::NodeHandle& node, ros::NodeHandle& privateN
     return false;
 
   // subscribe to IMU topic
-  _subImu = node.subscribe<sensor_msgs::Imu>("/imu/loam", 50, &ScanRegistration::handleIMUMessage, this); //removing imu data from loam
+  _subImu = node.subscribe<sensor_msgs::Imu>("/imu/loam", 50, &ScanRegistration::handleIMUMessage, this); //removing imu data form loam
 
   // advertise scan registration topics
   _pubLaserCloud            = node.advertise<sensor_msgs::PointCloud2>("/velodyne_cloud_2", 2);
@@ -169,9 +169,9 @@ void ScanRegistration::handleIMUMessage(const sensor_msgs::Imu::ConstPtr& imuIn)
   tf::Matrix3x3(orientation).getRPY(roll, pitch, yaw);
 
   Vector3 acc;
-  acc.x() = float(imuIn->linear_acceleration.x - sin(roll) * cos(pitch) * 9.81);
-  acc.y() = float(imuIn->linear_acceleration.y - cos(roll) * cos(pitch) * 9.81);
-  acc.z() = float(imuIn->linear_acceleration.z + sin(pitch)             * 9.81);
+  acc.x() = float(imuIn->linear_acceleration.y - sin(roll) * cos(pitch) * 9.81);
+  acc.y() = float(imuIn->linear_acceleration.z - cos(roll) * cos(pitch) * 9.81);
+  acc.z() = float(imuIn->linear_acceleration.x + sin(pitch)             * 9.81);
 
   IMUState newState;
   newState.stamp = fromROSTime( imuIn->header.stamp);

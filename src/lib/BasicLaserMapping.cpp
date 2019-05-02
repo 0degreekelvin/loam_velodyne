@@ -606,9 +606,9 @@ void BasicLaserMapping::updateIMU(IMUState2 const& newState)
 
 void BasicLaserMapping::updateOdometry(double pitch, double yaw, double roll, double x, double y, double z)
 {
-   _transformSum.rot_x = roll;
-   _transformSum.rot_y = pitch;
-   _transformSum.rot_z = yaw;
+   _transformSum.rot_x = pitch;
+   _transformSum.rot_y = yaw;
+   _transformSum.rot_z = roll;
 
    _transformSum.pos.x() = float(x);
    _transformSum.pos.y() = float(y);
